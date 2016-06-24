@@ -1,6 +1,7 @@
 package com.cooksys.ftd.io;
 
 import java.io.BufferedReader;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
@@ -28,7 +29,14 @@ public class Client implements Runnable {
 		try {
 			String file = "C:\\Code\\Day 10\\IO\\input.txt";
 			log.info("Sending file");
-			log.info("Server Message: {}", Server.writeOutput(file));
+			try (FileInputStream in = new FileInputStream(file)) {
+				log.info("File Stream Started");
+				int c;
+				while((c = in.read()) != -1) {
+					Server.writeOutput(c);
+					}
+				log.info("Success!");
+			}
 		}  catch (Exception e) {
 			log.error("ERROR: File Transfer Failed", e);
 		}
@@ -36,9 +44,9 @@ public class Client implements Runnable {
 	
 	@Override
 	public void run(){
-		try (Socket server = new Socket(this.hostname, this.port);
-				BufferedReader reader = new BufferedReader(new InputStreamReader(server.getInputStream()));
-				PrintWriter writer = new PrintWriter(server.getOutputStream(), true);) {
+		try (Socket client = new Socket(this.hostname, this.port);
+				BufferedReader reader = new BufferedReader(new InputStreamReader(client.getInputStream()));
+				PrintWriter writer = new PrintWriter(client.getOutputStream(), true);) {
 
 
 			// send a bunch of messages and read the responses

@@ -1,7 +1,6 @@
 package com.cooksys.ftd.io;
 
 import java.io.BufferedReader;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -29,13 +28,9 @@ public class Server implements Runnable {
 		Server.output = output;
 	}
 	
-	public static String writeOutput(String input) throws Exception {
-		try (FileInputStream in = new FileInputStream(input); FileOutputStream out = new FileOutputStream(Server.output);) {
-		int c;
-		while((c = in.read()) != -1) {
+	public static void writeOutput(int c) throws Exception {
+		try (FileOutputStream out = new FileOutputStream(Server.output);) {
 			out.write(c);
-			}
-		return "Success!";
 		}
 	}
 
@@ -44,6 +39,7 @@ public class Server implements Runnable {
 	@Override
 	public void run() {
 		try (ServerSocket ss = new ServerSocket(this.port);) {
+			log.info("hello");
 			while (true) {
 				Socket client = ss.accept();
 				clients.add(client);
@@ -51,6 +47,7 @@ public class Server implements Runnable {
 				PrintWriter writer = new PrintWriter(client.getOutputStream(), true);
 				ServerProtocol protocol = new ServerProtocol(reader, writer);
 				new Thread(protocol).start();
+				
 			}
 		} catch (IOException e) {
 			log.error("server fail! oh noes :(", e);
